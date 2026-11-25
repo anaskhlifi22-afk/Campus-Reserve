@@ -4,6 +4,14 @@ void main() {
   runApp(const CampusReserveApp());
 }
 
+// ================= COLORS =================
+
+const Color navy = Color(0xFF173B70);
+const Color blue = Color(0xFF2864B4);
+const Color background = Color(0xFFF4F7FC);
+
+// ================= MAIN APP =================
+
 class CampusReserveApp extends StatefulWidget {
   const CampusReserveApp({super.key});
 
@@ -13,15 +21,9 @@ class CampusReserveApp extends StatefulWidget {
 
 class _CampusReserveAppState extends State<CampusReserveApp> {
   final List<Map<String, String>> accounts = [];
-
   Map<String, String>? currentUser;
 
-  void register(
-      String name,
-      String email,
-      String phone,
-      String password,
-      ) {
+  void register(String name, String email, String phone, String password) {
     accounts.add({
       'name': name,
       'email': email,
@@ -58,32 +60,63 @@ class _CampusReserveAppState extends State<CampusReserveApp> {
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: 'Roboto',
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF173B70),
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: navy),
       ),
       home: currentUser == null
           ? WelcomeScreen(
-        onLogin: (email, password) {
-          return login(email, password);
-        },
+        onLogin: login,
         onRegister: register,
         accounts: accounts,
         onSuccess: () => setState(() {}),
       )
           : HomeScreen(
-        user: currentUser!,
+       user: currentUser!,
         onLogout: logout,
       ),
     );
   }
 }
 
-// ================= COLORS =================
+// ================= REUSABLE FIELD =================
 
-const Color navy = Color(0xFF173B70);
-const Color blue = Color(0xFF2864B4);
-const Color background = Color(0xFFF4F7FC);
+Widget buildField({
+  required TextEditingController controller,
+  required String label,
+  required IconData icon,
+  TextInputType keyboardType = TextInputType.text,
+  bool obscure = false,
+  Widget? suffix,
+  String? Function(String?)? validator,
+}) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 17),
+    child: TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscure,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: navy),
+        suffixIcon: suffix,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Color(0xFFE0E6EF)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: navy, width: 1.5),
+        ),
+      ),
+    ),
+  );
+}
 
 // ================= WELCOME SCREEN =================
 
@@ -112,7 +145,6 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 35),
-
                 Container(
                   height: 115,
                   width: 115,
@@ -133,9 +165,7 @@ class WelcomeScreen extends StatelessWidget {
                     size: 65,
                   ),
                 ),
-
                 const SizedBox(height: 25),
-
                 const Text(
                   'Campus Reserve',
                   style: TextStyle(
@@ -144,20 +174,13 @@ class WelcomeScreen extends StatelessWidget {
                     color: navy,
                   ),
                 ),
-
                 const SizedBox(height: 10),
-
                 const Text(
                   'Réservation de salles et terrains',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.blueGrey,
-                    fontSize: 15,
-                  ),
+                  style: TextStyle(color: Colors.blueGrey, fontSize: 15),
                 ),
-
                 const SizedBox(height: 35),
-
                 Container(
                   padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
@@ -180,19 +203,13 @@ class WelcomeScreen extends StatelessWidget {
                           color: navy,
                         ),
                       ),
-
                       const SizedBox(height: 10),
-
                       const Text(
                         'Réservez facilement vos espaces universitaires.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.blueGrey,
-                        ),
+                        style: TextStyle(color: Colors.blueGrey),
                       ),
-
                       const SizedBox(height: 30),
-
                       SizedBox(
                         width: double.infinity,
                         height: 55,
@@ -223,9 +240,7 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 15),
-
                       SizedBox(
                         width: double.infinity,
                         height: 55,
@@ -260,9 +275,7 @@ class WelcomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 35),
-
                 const Text(
                   'Université de Gafsa',
                   style: TextStyle(
@@ -270,7 +283,6 @@ class WelcomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-
                 const SizedBox(height: 10),
               ],
             ),
@@ -299,7 +311,6 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final formKey = GlobalKey<FormState>();
-
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
@@ -379,16 +390,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const SizedBox(height: 8),
-
               const Text(
                 'Remplissez vos informations pour commencer.',
                 style: TextStyle(color: Colors.blueGrey),
               ),
-
               const SizedBox(height: 30),
-
               buildField(
                 controller: nameController,
                 label: 'Nom complet',
@@ -400,7 +407,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return null;
                 },
               ),
-
               buildField(
                 controller: emailController,
                 label: 'Adresse Email',
@@ -415,7 +421,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return null;
                 },
               ),
-
               buildField(
                 controller: phoneController,
                 label: 'Numéro de téléphone',
@@ -428,7 +433,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return null;
                 },
               ),
-
               buildField(
                 controller: passwordController,
                 label: 'Mot de passe',
@@ -436,9 +440,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 obscure: hidePassword,
                 suffix: IconButton(
                   onPressed: () {
-                    setState(() {
-                      hidePassword = !hidePassword;
-                    });
+                    setState(() => hidePassword = !hidePassword);
                   },
                   icon: Icon(
                     hidePassword
@@ -453,7 +455,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return null;
                 },
               ),
-
               buildField(
                 controller: confirmController,
                 label: 'Confirmer le mot de passe',
@@ -466,9 +467,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return null;
                 },
               ),
-
               const SizedBox(height: 15),
-
               SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -490,7 +489,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
             ],
           ),
@@ -561,15 +559,12 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-
             const Icon(
               Icons.account_circle_rounded,
               size: 85,
               color: navy,
             ),
-
             const SizedBox(height: 20),
-
             const Text(
               'Bon retour !',
               style: TextStyle(
@@ -578,23 +573,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 8),
-
             const Text(
               'Connectez-vous à votre compte.',
               style: TextStyle(color: Colors.blueGrey),
             ),
-
             const SizedBox(height: 35),
-
             buildField(
               controller: emailController,
               label: 'Adresse Email',
               icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
             ),
-
             buildField(
               controller: passwordController,
               label: 'Mot de passe',
@@ -602,9 +592,7 @@ class _LoginScreenState extends State<LoginScreen> {
               obscure: hidePassword,
               suffix: IconButton(
                 onPressed: () {
-                  setState(() {
-                    hidePassword = !hidePassword;
-                  });
+                  setState(() => hidePassword = !hidePassword);
                 },
                 icon: Icon(
                   hidePassword
@@ -613,9 +601,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 15),
-
             SizedBox(
               width: double.infinity,
               height: 55,
@@ -643,11 +629,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-// ================= HOME SCREEN =================
-
 class HomeScreen extends StatelessWidget {
-  final Map<String, String> user;
+  final Map<String,String> user;
   final VoidCallback onLogout;
 
   const HomeScreen({
@@ -659,16 +642,16 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: background,
       appBar: AppBar(
-        backgroundColor: navy,
-        foregroundColor: Colors.white,
         title: const Text(
           'Campus Reserve',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white),
         ),
+        backgroundColor: navy,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
+            icon: const Icon(Icons.logout),
             onPressed: () {
               showDialog(
                 context: context,
@@ -682,7 +665,7 @@ class HomeScreen extends StatelessWidget {
                       onPressed: () => Navigator.pop(context),
                       child: const Text('Annuler'),
                     ),
-                    TextButton(
+                    ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
                         onLogout();
@@ -693,144 +676,69 @@ class HomeScreen extends StatelessWidget {
                 ),
               );
             },
-            icon: const Icon(Icons.logout),
           ),
         ],
       ),
-
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 15),
-
+            const SizedBox(height: 20),
             Text(
-              'Bonjour, ${user['name']} 👋',
+              'Bienvenue, $user 👋',
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 23,
                 fontWeight: FontWeight.bold,
                 color: navy,
               ),
             ),
-
-            const SizedBox(height: 8),
-
+            const SizedBox(height: 10),
             const Text(
-              'Bienvenue dans votre espace universitaire.',
-              style: TextStyle(color: Colors.blueGrey),
+              'Que souhaitez-vous faire aujourd’hui ?',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-
-            const SizedBox(height: 25),
-
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [navy, blue],
-                ),
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.calendar_month_rounded,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                  SizedBox(height: 15),
-                  Text(
-                    'Réservez votre espace',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Accédez facilement aux espaces disponibles de votre université.',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             const SizedBox(height: 30),
 
-            const Text(
-              'Nos services',
-              style: TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.bold,
-                color: navy,
+            // Premier bouton
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.meeting_room),
+                label: const Text(
+                  'Réserver une salle',
+                  style: TextStyle(fontSize: 17),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RoomsScreen(),
+                    ),
+                  );
+                },
               ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
 
-            serviceCard(
-              icon: Icons.meeting_room_rounded,
-              title: 'Salles',
-              subtitle: 'Consulter les salles disponibles',
-              onTap: () => showComingSoon(context),
-            ),
-
-            serviceCard(
-              icon: Icons.sports_soccer_rounded,
-              title: 'Terrains sportifs',
-              subtitle: 'Consulter les terrains disponibles',
-              onTap: () => showComingSoon(context),
-            ),
-
-            serviceCard(
-              icon: Icons.event_note_rounded,
-              title: 'Mes réservations',
-              subtitle: 'Consulter mes réservations',
-              onTap: () => showComingSoon(context),
-            ),
-
-            serviceCard(
-              icon: Icons.person_outline,
-              title: 'Mon profil',
-              subtitle: 'Informations de votre compte',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text('Mon profil'),
-                    content: Text(
-                      'Nom : ${user['name']}\n'
-                          'Email : ${user['email']}\n'
-                          'Téléphone : ${user['phone']}\n'
-                          'Rôle : ${user['role']}',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Fermer'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 25),
-
-            const Center(
-              child: Text(
-                'Université de Gafsa • Campus Reserve',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.blueGrey,
-                  fontSize: 12,
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.history),
+                label: const Text(
+                  'Mes réservations',
+                  style: TextStyle(fontSize: 17),
                 ),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Fonctionnalité bientôt disponible'),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -840,122 +748,274 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// ================= REUSABLE WIDGETS =================
+// ---------------- ROOMS SCREEN ----------------
 
-Widget buildField({
-  required TextEditingController controller,
-  required String label,
-  required IconData icon,
-  bool obscure = false,
-  Widget? suffix,
-  TextInputType? keyboardType,
-  String? Function(String?)? validator,
-}) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 18),
-    child: TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      keyboardType: keyboardType,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: navy),
-        suffixIcon: suffix,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Color(0xFFE1E8F0)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: navy, width: 1.5),
-        ),
+class RoomsScreen extends StatelessWidget {
+  const RoomsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final rooms = [
+      {
+        'name': 'Salle de cours',
+        'icon': Icons.school,
+        'description': 'Pour les cours et les réunions',
+      },
+      {
+        'name': 'Salle informatique',
+        'icon': Icons.computer,
+        'description': 'Équipée d’ordinateurs',
+      },
+      {
+        'name': 'Salle de réunion',
+        'icon': Icons.groups,
+        'description': 'Pour les travaux en groupe',
+      },
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Choisir une salle'),
+        backgroundColor: navy,
+        foregroundColor: Colors.white,
       ),
-    ),
-  );
-}
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: rooms.length,
+        itemBuilder: (context, index) {
+          final room = rooms[index];
 
-Widget serviceCard({
-  required IconData icon,
-  required String title,
-  required String subtitle,
-  required VoidCallback onTap,
-}) {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 14),
-    child: Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(18),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Row(
-            children: [
-              Container(
-                height: 55,
-                width: 55,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEAF1FC),
-                  borderRadius: BorderRadius.circular(15),
-                ),
+          return Card(
+            margin: const EdgeInsets.only(bottom: 15),
+            elevation: 3,
+            child: ListTile(
+              contentPadding: const EdgeInsets.all(16),
+              leading: CircleAvatar(
+                backgroundColor: navy,
                 child: Icon(
-                  icon,
-                  color: navy,
-                  size: 29,
+                  room['icon'] as IconData,
+                  color: Colors.white,
                 ),
               ),
-
-              const SizedBox(width: 15),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: navy,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        color: Colors.blueGrey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
+              title: Text(
+                room['name'] as String,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-
-              const Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.blueGrey,
-                size: 17,
-              ),
-            ],
-          ),
-        ),
+              subtitle: Text(room['description'] as String),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ReservationScreen(
+                      roomName: room['name'] as String,
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
       ),
-    ),
-  );
+    );
+  }
 }
 
-void showComingSoon(BuildContext context) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text('Cette fonctionnalité sera disponible prochainement.'),
-    ),
-  );
+// ---------------- RESERVATION SCREEN ----------------
+
+class ReservationScreen extends StatefulWidget {
+  final String roomName;
+
+  const ReservationScreen({
+    super.key,
+    required this.roomName,
+  });
+
+  @override
+  State<ReservationScreen> createState() =>
+      _ReservationScreenState();
+}
+
+class _ReservationScreenState extends State<ReservationScreen> {
+  final nameController = TextEditingController();
+  final purposeController = TextEditingController();
+
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    purposeController.dispose();
+    super.dispose();
+  }
+
+  Future<void> chooseDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 365),
+      ),
+    );
+
+    if (date != null) {
+      setState(() {
+        selectedDate = date;
+      });
+    }
+  }
+
+  Future<void> chooseTime() async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (time != null) {
+      setState(() {
+        selectedTime = time;
+      });
+    }
+  }
+
+  void confirmReservation() {
+    if (nameController.text.trim().isEmpty ||
+        purposeController.text.trim().isEmpty ||
+        selectedDate == null ||
+        selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Veuillez remplir tous les champs'),
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Réservation confirmée'),
+        content: Text(
+          'Votre demande pour ${widget.roomName} a été enregistrée.',
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Réservation'),
+        backgroundColor: navy,
+        foregroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.roomName,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: navy,
+              ),
+            ),
+            const SizedBox(height: 25),
+
+            const Text(
+              'Nom complet',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                hintText: 'Entrez votre nom',
+                prefixIcon: Icon(Icons.person),
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              'Motif de réservation',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: purposeController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'Entrez le motif',
+                prefixIcon: Icon(Icons.description),
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: OutlinedButton.icon(
+                onPressed: chooseDate,
+                icon: const Icon(Icons.calendar_month),
+                label: Text(
+                  selectedDate == null
+                      ? 'Choisir une date'
+                      : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: OutlinedButton.icon(
+                onPressed: chooseTime,
+                icon: const Icon(Icons.access_time),
+                label: Text(
+                  selectedTime == null
+                      ? 'Choisir une heure'
+                      : selectedTime!.format(context),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: confirmReservation,
+                child: const Text(
+                  'Confirmer la réservation',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
