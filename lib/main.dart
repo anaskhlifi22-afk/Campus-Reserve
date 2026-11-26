@@ -4,13 +4,10 @@ void main() {
   runApp(const CampusReserveApp());
 }
 
-// ================= COLORS =================
-
 const Color navy = Color(0xFF173B70);
 const Color blue = Color(0xFF2864B4);
 const Color background = Color(0xFFF4F7FC);
 
-// ================= MAIN APP =================
 
 class CampusReserveApp extends StatefulWidget {
   const CampusReserveApp({super.key});
@@ -77,7 +74,7 @@ class _CampusReserveAppState extends State<CampusReserveApp> {
   }
 }
 
-// ================= REUSABLE FIELD =================
+
 
 Widget buildField({
   required TextEditingController controller,
@@ -118,7 +115,7 @@ Widget buildField({
   );
 }
 
-// ================= WELCOME SCREEN =================
+
 
 class WelcomeScreen extends StatelessWidget {
   final Function(String, String) onLogin;
@@ -293,7 +290,7 @@ class WelcomeScreen extends StatelessWidget {
   }
 }
 
-// ================= REGISTER SCREEN =================
+
 
 class RegisterScreen extends StatefulWidget {
   final Function(String, String, String, String) onRegister;
@@ -498,7 +495,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 }
 
-// ================= LOGIN SCREEN =================
+
 
 class LoginScreen extends StatefulWidget {
   final Function(String, String) onLogin;
@@ -630,7 +627,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 class HomeScreen extends StatelessWidget {
-  final Map<String,String> user;
+  final Map<String, String> user;
   final VoidCallback onLogout;
 
   const HomeScreen({
@@ -639,35 +636,59 @@ class HomeScreen extends StatelessWidget {
     required this.onLogout,
   });
 
+  void openPage(BuildContext context, String title,
+      IconData icon, String description) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FeatureScreen(
+          title: title,
+          icon: icon,
+          description: description,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isManager = user['role'] == 'Responsable';
+
     return Scaffold(
+      backgroundColor: background,
       appBar: AppBar(
+        backgroundColor: navy,
         title: const Text(
           'Campus Reserve',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: navy,
-        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
+                builder: (dialogContext) => AlertDialog(
                   title: const Text('Déconnexion'),
                   content: const Text(
                     'Voulez-vous vraiment vous déconnecter ?',
                   ),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () =>
+                          Navigator.pop(dialogContext),
                       child: const Text('Annuler'),
                     ),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: navy,
+                        foregroundColor: Colors.white,
+                      ),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(dialogContext);
                         onLogout();
                       },
                       child: const Text('Déconnexion'),
@@ -679,66 +700,251 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
+
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
+
+            const SizedBox(height: 10),
+
             Text(
-              'Bienvenue, $user 👋',
+              'Bonjour, ${user['name'] ?? 'Étudiant'} 👋',
               style: const TextStyle(
-                fontSize: 23,
+                fontSize: 25,
                 fontWeight: FontWeight.bold,
                 color: navy,
               ),
             ),
-            const SizedBox(height: 10),
+
+            const SizedBox(height: 8),
+
             const Text(
-              'Que souhaitez-vous faire aujourd’hui ?',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              'Bienvenue dans votre espace Campus Reserve.',
+              style: TextStyle(
+                color: Colors.blueGrey,
+                fontSize: 14,
+              ),
             ),
+
+            const SizedBox(height: 25),
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [navy, blue],
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.calendar_month,
+                    color: Colors.white,
+                    size: 35,
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    'Réservez votre espace universitaire',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Trouvez une salle ou un terrain '
+                        'disponible en quelques clics.',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             const SizedBox(height: 30),
 
-            // Premier bouton
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.meeting_room),
-                label: const Text(
-                  'Réserver une salle',
-                  style: TextStyle(fontSize: 17),
-                ),
-                onPressed: () {
-                  Navigator.push(
+            const Text(
+              'Nos services',
+              style: TextStyle(
+                color: navy,
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 15,
+              childAspectRatio: 1.05,
+              children: [
+
+                serviceCard(
+                  context,
+                  'Ressources',
+                  Icons.apartment,
+                  'Consulter les salles et terrains',
+                  Colors.blue,
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ResourcesScreen(),
+                  ),
+                );
+              },
+                  ),
+
+                serviceCard(
+                  context,
+                  'Mes réservations',
+                  Icons.calendar_month,
+                  'Gérer mes réservations',
+                  Colors.green,
+                      () => openPage(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const RoomsScreen(),
+                    'Mes réservations',
+                    Icons.calendar_month,
+                    'Retrouvez vos réservations à venir '
+                        'et vos réservations passées.',
+                  ),
+                ),
+
+                serviceCard(
+                  context,
+                  'Assistant IA',
+                  Icons.smart_toy,
+                  'Trouver un espace facilement',
+                  Colors.deepPurple,
+                      () => openPage(
+                    context,
+                    'Assistant IA',
+                    Icons.smart_toy,
+                    'Décrivez votre besoin et trouvez '
+                        'les créneaux qui vous conviennent.',
+                  ),
+                ),
+
+                if (isManager)
+                  serviceCard(
+                    context,
+                    'Responsable',
+                    Icons.admin_panel_settings,
+                    'Gérer les ressources',
+                    Colors.orange,
+                        () => openPage(
+                      context,
+                      'Espace responsable',
+                      Icons.admin_panel_settings,
+                      'Gérez les ressources et consultez '
+                          'les réservations.',
                     ),
-                  );
-                },
+                  ),
+              ],
+            ),
+
+            const SizedBox(height: 30),
+
+            const Text(
+              'Prochaines réservations',
+              style: TextStyle(
+                color: navy,
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: const Color(0xFFE0E6EF),
+                ),
+              ),
+              child: const Column(
+                children: [
+                  Icon(
+                    Icons.event_available,
+                    size: 45,
+                    color: Colors.blueGrey,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Aucune réservation pour le moment.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
 
-            SizedBox(
-              width: double.infinity,
-              height: 60,
-              child: OutlinedButton.icon(
-                icon: const Icon(Icons.history),
-                label: const Text(
-                  'Mes réservations',
-                  style: TextStyle(fontSize: 17),
-                ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Fonctionnalité bientôt disponible'),
-                    ),
-                  );
-                },
+  Widget serviceCard(
+      BuildContext context,
+      String title,
+      IconData icon,
+      String description,
+      Color color,
+      VoidCallback onTap,
+      ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: const Color(0xFFE0E6EF),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 32),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                color: navy,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              description,
+              style: const TextStyle(
+                color: Colors.blueGrey,
+                fontSize: 11,
               ),
             ),
           ],
@@ -748,273 +954,149 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// ---------------- ROOMS SCREEN ----------------
+class FeatureScreen extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final String description;
 
-class RoomsScreen extends StatelessWidget {
-  const RoomsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final rooms = [
-      {
-        'name': 'Salle de cours',
-        'icon': Icons.school,
-        'description': 'Pour les cours et les réunions',
-      },
-      {
-        'name': 'Salle informatique',
-        'icon': Icons.computer,
-        'description': 'Équipée d’ordinateurs',
-      },
-      {
-        'name': 'Salle de réunion',
-        'icon': Icons.groups,
-        'description': 'Pour les travaux en groupe',
-      },
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Choisir une salle'),
-        backgroundColor: navy,
-        foregroundColor: Colors.white,
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: rooms.length,
-        itemBuilder: (context, index) {
-          final room = rooms[index];
-
-          return Card(
-            margin: const EdgeInsets.only(bottom: 15),
-            elevation: 3,
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              leading: CircleAvatar(
-                backgroundColor: navy,
-                child: Icon(
-                  room['icon'] as IconData,
-                  color: Colors.white,
-                ),
-              ),
-              title: Text(
-                room['name'] as String,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(room['description'] as String),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ReservationScreen(
-                      roomName: room['name'] as String,
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// ---------------- RESERVATION SCREEN ----------------
-
-class ReservationScreen extends StatefulWidget {
-  final String roomName;
-
-  const ReservationScreen({
+  const FeatureScreen({
     super.key,
-    required this.roomName,
+    required this.title,
+    required this.icon,
+    required this.description,
   });
 
   @override
-  State<ReservationScreen> createState() =>
-      _ReservationScreenState();
-}
-
-class _ReservationScreenState extends State<ReservationScreen> {
-  final nameController = TextEditingController();
-  final purposeController = TextEditingController();
-
-  DateTime? selectedDate;
-  TimeOfDay? selectedTime;
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    purposeController.dispose();
-    super.dispose();
-  }
-
-  Future<void> chooseDate() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(
-        const Duration(days: 365),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: background,
+      appBar: AppBar(
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: navy,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(25),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 85,
+                color: navy,
+              ),
+              const SizedBox(height: 25),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: navy,
+                ),
+              ),
+              const SizedBox(height: 15),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.blueGrey,
+                ),
+              ),
+              const SizedBox(height: 25),
+              const Text(
+                'Cette fonctionnalité sera développée '
+                    'dans la prochaine étape.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
       ),
     );
-
-    if (date != null) {
-      setState(() {
-        selectedDate = date;
-      });
-    }
   }
+}
+class ResourcesScreen extends StatelessWidget {
+  const ResourcesScreen({super.key});
 
-  Future<void> chooseTime() async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-
-    if (time != null) {
-      setState(() {
-        selectedTime = time;
-      });
-    }
-  }
-
-  void confirmReservation() {
-    if (nameController.text.trim().isEmpty ||
-        purposeController.text.trim().isEmpty ||
-        selectedDate == null ||
-        selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez remplir tous les champs'),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: background,
+      appBar: AppBar(
+        title: const Text(
+          'Ressources',
+          style: TextStyle(color: Colors.white),
         ),
-      );
-      return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Réservation confirmée'),
-        content: Text(
-          'Votre demande pour ${widget.roomName} a été enregistrée.',
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: const Text('OK'),
+        backgroundColor: navy,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          const Text(
+            'Choisissez une catégorie',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: navy,
+            ),
+          ),
+          const SizedBox(height: 20),
+          resourceCard(
+            Icons.meeting_room,
+            'Salles',
+            'Consulter les salles disponibles',
+            Colors.blue,
+          ),
+          resourceCard(
+            Icons.science,
+            'Laboratoires',
+            'Consulter les laboratoires',
+            Colors.deepPurple,
+          ),
+          resourceCard(
+            Icons.sports_soccer,
+            'Terrains',
+            'Consulter les terrains sportifs',
+            Colors.green,
           ),
         ],
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Réservation'),
-        backgroundColor: navy,
-        foregroundColor: Colors.white,
+  Widget resourceCard(
+      IconData icon,
+      String title,
+      String description,
+      Color color,
+      ) {
+    return Card(
+      color: Colors.white,
+      margin: const EdgeInsets.only(bottom: 15),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.roomName,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: navy,
-              ),
-            ),
-            const SizedBox(height: 25),
-
-            const Text(
-              'Nom complet',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                hintText: 'Entrez votre nom',
-                prefixIcon: Icon(Icons.person),
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              'Motif de réservation',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: purposeController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: 'Entrez le motif',
-                prefixIcon: Icon(Icons.description),
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: OutlinedButton.icon(
-                onPressed: chooseDate,
-                icon: const Icon(Icons.calendar_month),
-                label: Text(
-                  selectedDate == null
-                      ? 'Choisir une date'
-                      : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: OutlinedButton.icon(
-                onPressed: chooseTime,
-                icon: const Icon(Icons.access_time),
-                label: Text(
-                  selectedTime == null
-                      ? 'Choisir une heure'
-                      : selectedTime!.format(context),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                onPressed: confirmReservation,
-                child: const Text(
-                  'Confirmer la réservation',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            ),
-          ],
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(15),
+        leading: Icon(icon, color: color, size: 35),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: navy,
+          ),
         ),
+        subtitle: Text(description),
+        trailing: const Icon(Icons.arrow_forward_ios),
       ),
     );
   }
