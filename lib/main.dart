@@ -17,6 +17,7 @@ class CampusReserveApp extends StatefulWidget {
 }
 
 class _CampusReserveAppState extends State<CampusReserveApp> {
+  List<Map<String, String>> reservations = [];
   final List<Map<String, String>> accounts = [];
   Map<String, String>? currentUser;
 
@@ -67,8 +68,9 @@ class _CampusReserveAppState extends State<CampusReserveApp> {
         onSuccess: () => setState(() {}),
       )
           : HomeScreen(
-       user: currentUser!,
+        user: currentUser!,
         onLogout: logout,
+        reservations: reservations,
       ),
     );
   }
@@ -629,11 +631,13 @@ class _LoginScreenState extends State<LoginScreen> {
 class HomeScreen extends StatelessWidget {
   final Map<String, String> user;
   final VoidCallback onLogout;
+  final List<Map<String, String>> reservations;
 
   const HomeScreen({
     super.key,
     required this.user,
     required this.onLogout,
+    required this.reservations,
   });
 
   void openPage(BuildContext context, String title,
@@ -801,7 +805,9 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ResourcesScreen(),
+                    builder: (context) => ResourcesScreen(
+                      reservations: reservations,
+                    ),
                   ),
                 );
               },
@@ -813,13 +819,16 @@ class HomeScreen extends StatelessWidget {
                   Icons.calendar_month,
                   'Gérer mes réservations',
                   Colors.green,
-                      () => openPage(
-                    context,
-                    'Mes réservations',
-                    Icons.calendar_month,
-                    'Retrouvez vos réservations à venir '
-                        'et vos réservations passées.',
-                  ),
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyReservationsScreen(
+                              reservations: reservations,
+                            ),
+                          ),
+                        );
+                  },
                 ),
 
                 serviceCard(
@@ -1024,79 +1033,409 @@ class FeatureScreen extends StatelessWidget {
   }
 }
 class ResourcesScreen extends StatelessWidget {
-  const ResourcesScreen({super.key});
+  final List<Map<String, String>> reservations;
+
+  const ResourcesScreen({
+    super.key,
+    required this.reservations,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: background,
+      appBar: AppBar(
+        title: const Text('Ressources'),
+        backgroundColor: navy,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            resourceCard(
+              context,
+              Icons.meeting_room,
+              'Salles',
+              'Consulter les salles disponibles',
+              blue,
+              reservations,
+            ),
+            resourceCard(
+              context,
+              Icons.computer,
+              'Laboratoires',
+              'Consulter les laboratoires',
+              blue,
+              reservations,
+            ),
+            resourceCard(
+              context,
+              Icons.sports_soccer,
+              'Terrains',
+              'Consulter les terrains',
+              blue,
+              reservations,
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+}
+Widget resourceCard(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String description,
+    Color color,
+    List<Map<String, String>> reservations,
+    ) {
+  return Card(
+    color: Colors.white,
+    margin: const EdgeInsets.only(bottom: 15),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: ListTile(
+      contentPadding: const EdgeInsets.all(15),
+      leading: Icon(icon, color: color, size: 35),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: navy,
+        ),
+      ),
+      subtitle: Text(description),
+      trailing: const Icon(Icons.arrow_forward_ios),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResourceListScreen(
+              category: title,
+              reservations: reservations,
+            ),
+
+          ),
+        );
+      },
+    ),
+  );
+}
+class ResourceListScreen extends StatelessWidget {
+  final String category;
+  final List<Map<String, String>> reservations;
+
+  const ResourceListScreen({
+    super.key,
+    required this.category,
+    required this.reservations,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<String, List<Map<String, dynamic>>> data = {
+      'Salles': [
+        {
+          'name': 'Salle A1',
+          'capacity': 30,
+          'equipment': 'Projecteur, Tables, Chaises',
+        },
+        {
+          'name': 'Salle A2',
+          'capacity': 25,
+          'equipment': 'Tables, Chaises',
+        },
+      ],
+      'Laboratoires': [
+        {
+          'name': 'Laboratoire Informatique 1',
+          'capacity': 20,
+          'equipment': 'Ordinateurs, Internet',
+        },
+        {
+          'name': 'Laboratoire Informatique 2',
+          'capacity': 15,
+          'equipment': 'Ordinateurs, Projecteur',
+        },
+      ],
+      'Terrains': [
+        {
+          'name': 'Terrain de Football',
+          'capacity': 22,
+          'equipment': 'Gazon, Vestiaires',
+        },
+        {
+          'name': 'Terrain de Basketball',
+          'capacity': 10,
+          'equipment': 'Paniers, Ballon',
+        },
+      ],
+    };
+
+    final resources = data[category] ?? [];
+
+    return Scaffold(
+      backgroundColor: background,
+      appBar: AppBar(
+        title: Text(category),
+        backgroundColor: navy,
+        foregroundColor: Colors.white,
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(20),
+        itemCount: resources.length,
+        itemBuilder: (context, index) {
+          final resource = resources[index];
+
+          return Card(
+            margin: const EdgeInsets.only(bottom: 15),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    resource['name'],
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: navy,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text('Capacité : ${resource['capacity']} personnes'),
+                  const SizedBox(height: 5),
+                  Text('Équipements : ${resource['equipment']}'),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Disponible',
+                    style: TextStyle(color: Colors.green),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ReservationScreen(
+                              resourceName: resource['name']!,
+                              reservations: reservations,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: blue,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Réserver'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+class ReservationScreen extends StatefulWidget {
+  final String resourceName;
+  final List<Map<String, String>> reservations;
+  const ReservationScreen({
+    super.key,
+    required this.resourceName,
+    required this.reservations,
+
+  });
+
+  @override
+  State<ReservationScreen> createState() =>
+      _ReservationScreenState();
+}
+
+class _ReservationScreenState extends State<ReservationScreen> {
+  DateTime? selectedDate;
+  String? selectedTime;
+
+  Future<void> chooseDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 90),
+      ),
+    );
+
+    if (date != null) {
+      setState(() {
+        selectedDate = date;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
-        title: const Text(
-          'Ressources',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Réservation'),
         backgroundColor: navy,
-        iconTheme: const IconThemeData(color: Colors.white),
+        foregroundColor: Colors.white,
       ),
-      body: ListView(
+      body: Padding(
         padding: const EdgeInsets.all(20),
-        children: [
-          const Text(
-            'Choisissez une catégorie',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: navy,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.resourceName,
+              style: const TextStyle(
+                fontSize: 23,
+                fontWeight: FontWeight.bold,
+                color: navy,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          resourceCard(
-            Icons.meeting_room,
-            'Salles',
-            'Consulter les salles disponibles',
-            Colors.blue,
-          ),
-          resourceCard(
-            Icons.science,
-            'Laboratoires',
-            'Consulter les laboratoires',
-            Colors.deepPurple,
-          ),
-          resourceCard(
-            Icons.sports_soccer,
-            'Terrains',
-            'Consulter les terrains sportifs',
-            Colors.green,
-          ),
-        ],
+            const SizedBox(height: 25),
+
+            const Text('Choisir une date'),
+            const SizedBox(height: 10),
+
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: chooseDate,
+                icon: const Icon(Icons.calendar_month),
+                label: Text(
+                  selectedDate == null
+                      ? 'Sélectionner une date'
+                      : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            const Text('Choisir une heure'),
+            const SizedBox(height: 10),
+
+            DropdownButtonFormField<String>(
+              initialValue: selectedTime,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Sélectionner une heure',
+              ),
+              items: [
+                '08:00 - 09:00',
+                '09:00 - 10:00',
+                '10:00 - 11:00',
+                '11:00 - 12:00',
+                '13:00 - 14:00',
+                '14:00 - 15:00',
+                '15:00 - 16:00',
+              ].map((time) {
+                return DropdownMenuItem(
+                  value: time,
+                  child: Text(time),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedTime = value;
+                });
+              },
+            ),
+
+            const SizedBox(height: 30),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (selectedDate == null ||
+                      selectedTime == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Veuillez choisir une date et une heure',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  widget.reservations.add({
+                    'resource': widget.resourceName,
+                    'date': '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+                    'time': selectedTime!,
+                  });
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Demande de réservation enregistrée !'),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(15),
+                ),
+                child: const Text('Confirmer la réservation'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+class MyReservationsScreen extends StatelessWidget {
+  final List<Map<String, String>> reservations;
 
-  Widget resourceCard(
-      IconData icon,
-      String title,
-      String description,
-      Color color,
-      ) {
-    return Card(
-      color: Colors.white,
-      margin: const EdgeInsets.only(bottom: 15),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+  const MyReservationsScreen({
+    super.key,
+    required this.reservations,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: background,
+      appBar: AppBar(
+        title: const Text('Mes réservations'),
+        backgroundColor: navy,
+        foregroundColor: Colors.white,
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(15),
-        leading: Icon(icon, color: color, size: 35),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: navy,
-          ),
-        ),
-        subtitle: Text(description),
-        trailing: const Icon(Icons.arrow_forward_ios),
+      body: reservations.isEmpty
+          ? const Center(
+        child: Text('Aucune réservation pour le moment.'),
+      )
+          : ListView.builder(
+        padding: const EdgeInsets.all(15),
+        itemCount: reservations.length,
+        itemBuilder: (context, index) {
+          final reservation = reservations[index];
+
+          return Card(
+            child: ListTile(
+              leading: const Icon(Icons.event, color: blue),
+              title: Text(reservation['resource']!),
+              subtitle: Text(
+                'Date: ${reservation['date']}\nHeure: ${reservation['time']}',
+              ),
+            ),
+          );
+        },
       ),
     );
   }
